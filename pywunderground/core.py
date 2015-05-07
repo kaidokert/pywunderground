@@ -68,7 +68,7 @@ def request(key, features, query, timeout=5):
     """
     data = {}
     data['key'] = key
-    data['features'] = '/'.join([f for f in features if f in FEATURES])
+    data['features'] = '/'.join([f for f in features if f in FEATURES or f.startswith('history_') ])
     data['query'] = quote(query)
     data['format'] = 'json'
     r = requests.get(API_URL.format(**data), timeout=timeout)
@@ -78,11 +78,12 @@ def request(key, features, query, timeout=5):
 
 def _unicode(string):
     """Try to convert a string to unicode using different encodings"""
+    fallback = 'utf-8'
     for encoding in ['utf-8', 'latin1']:
         try:
             result = unicode(string, encoding)
             return result
         except UnicodeDecodeError:
             pass
-    result = unicode(string, 'utf-8', 'replace')
+    result = unicode(string, fallback, 'replace')
     return result
